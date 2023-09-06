@@ -1,12 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
 #include "tokenization.hpp"
+#include "parser.hpp"
 
-std::vector<Token> tokenize(const std::string& str)
-{
-
-}
 std::string tokens_to_asm(const std::vector<Token>& tokens) {
     std::stringstream output;
     output << "global _main\n_main:\n";
@@ -42,6 +40,10 @@ int main(int argc, char* argv[])
     }
     Tokenizer tokenizer(std::move(contents));
     auto tokens = tokenizer.tokenize();
+
+    Parser parser(std::move(tokens));
+
+    auto tree = parser.parse();
 
     std::string asmb = tokens_to_asm(tokens);
 
