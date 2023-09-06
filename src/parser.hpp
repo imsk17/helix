@@ -39,7 +39,9 @@ public:
                     std::cerr << "Invalid Expression" << std::endl;
                     exit(EXIT_FAILURE);
                 }
-                if (!peek().has_value() || peek().value().type != TokenType::semi) {
+                if (peek().has_value() && peek().value().type == TokenType::semi) {
+                    consume();
+                } else {
                     std::cerr << "Invalid Expression" << std::endl;
                     exit(EXIT_FAILURE);
                 }

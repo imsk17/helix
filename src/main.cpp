@@ -2,27 +2,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "tokenization.hpp"
-#include "parser.hpp"
+#include "generator.hpp"
 
-std::string tokens_to_asm(const std::vector<Token>& tokens) {
-    std::stringstream output;
-    output << "global _main\n_main:\n";
-    for (int i = 0; i < tokens.size(); i++) {
-        const Token& token = tokens.at(i);
-        if (token.type == TokenType::exit) {
-            if (i+1 <tokens.size() && tokens.at(i+1).type == TokenType::int_lit) {
-                if (i+2 <tokens.size() && tokens.at(i+2).type == TokenType::semi) {
-                    // Syscall for Exit Code on Mac OS
-                    output << "    mov rax, 0x2000001\n";
-                    output << "    mov rdi, " <<  tokens.at(i+1).value.value() << "\n";
-                    output << "    syscall";
-                }
-            }
-        }
-    }
-    return output.str();
-}
 int main(int argc, char* argv[])
 {
 
@@ -45,11 +26,17 @@ int main(int argc, char* argv[])
 
     auto tree = parser.parse();
 
-    std::string asmb = tokens_to_asm(tokens);
+    if (!tree.has_value()) {
+        std::cerr << "No exit statement found" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+    Generator generator(tree.value());
+    auto assembly = generator.generate();
 
     {
         std::fstream file("out.asm", std::ios::out);
-        file << asmb;
+        file << assembly;
     }
 
     system("nasm -f macho64 out.asm");
