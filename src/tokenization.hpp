@@ -3,7 +3,7 @@
 #include "string"
 #include "vector"
 
-enum class TokenType { exit, int_lit, semi };
+enum class TokenType { exit, int_lit, semi, open_parenthesis, close_parenthesis };
 
 struct Token {
     TokenType type;
@@ -36,6 +36,14 @@ public:
                     std::cerr << "You Messed Up.";
                     exit(EXIT_FAILURE);
                 }
+            }
+            else if (peek().value() == '(') {
+                consume();
+                tokens.push_back({.type= TokenType::open_parenthesis});
+            }
+            else if (peek().value() == ')') {
+                consume();
+                tokens.push_back({.type= TokenType::close_parenthesis});
             }
             else if (std::isdigit(peek().value())) {
                 buf.push_back(consume());
