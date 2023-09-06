@@ -3,7 +3,7 @@
 #include "string"
 #include "vector"
 
-enum class TokenType { exit, int_lit, semi, open_parenthesis, close_parenthesis };
+enum class TokenType { exit, int_lit, semi, open_parenthesis, close_parenthesis, identifier, let, eq };
 
 struct Token {
     TokenType type;
@@ -32,18 +32,31 @@ public:
                     buf.clear();
                     continue;
                 }
+                else if (buf == "let") {
+                    tokens.push_back({ .type = TokenType::let });
+                    buf.clear();
+                    continue;
+                }
                 else {
-                    std::cerr << "You Messed Up.";
-                    exit(EXIT_FAILURE);
+                    tokens.push_back({ .type = TokenType::identifier, .value = buf });
+                    buf.clear();
+                    continue;
                 }
             }
             else if (peek().value() == '(') {
                 consume();
-                tokens.push_back({.type= TokenType::open_parenthesis});
+                tokens.push_back({ .type = TokenType::open_parenthesis });
+                continue;
+            }
+            else if (peek().value() == '=') {
+                consume();
+                tokens.push_back({ .type = TokenType::eq });
+                continue;
             }
             else if (peek().value() == ')') {
                 consume();
-                tokens.push_back({.type= TokenType::close_parenthesis});
+                tokens.push_back({ .type = TokenType::close_parenthesis });
+                continue;
             }
             else if (std::isdigit(peek().value())) {
                 buf.push_back(consume());
@@ -63,7 +76,7 @@ public:
                 continue;
             }
             else {
-                std::cerr<< "You Messed Up.";
+                std::cerr << "You Messed Up.";
                 exit(EXIT_FAILURE);
             }
         }
@@ -73,7 +86,7 @@ public:
 
 private:
     const std::string m_str;
-    int m_index = 0 ;
+    int m_index = 0;
     [[nodiscard]] inline std::optional<char> peek(int offset = 0) const
     {
         if (m_index + offset >= m_str.length()) {

@@ -24,15 +24,15 @@ int main(int argc, char* argv[])
 
     Parser parser(std::move(tokens));
 
-    auto tree = parser.parse();
+    auto tree = parser.parse_program();
 
     if (!tree.has_value()) {
-        std::cerr << "No exit statement found" << std::endl;
+        std::cerr << "Invalid Program" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     Generator generator(tree.value());
-    auto assembly = generator.generate();
+    auto assembly = generator.gen_program();
 
     {
         std::fstream file("out.asm", std::ios::out);
