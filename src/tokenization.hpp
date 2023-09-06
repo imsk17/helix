@@ -66,13 +66,13 @@ public:
 private:
     const std::string m_str;
     int m_index = 0 ;
-    [[nodiscard]] inline std::optional<char> peek(int ahead = 1) const
+    [[nodiscard]] inline std::optional<char> peek(int offset = 0) const
     {
-        if (m_index + ahead > m_str.length()) {
+        if (m_index + offset >= m_str.length()) {
             return {};
         }
         else {
-            return m_str.at(m_index);
+            return m_str.at(m_index + offset);
         }
     }
 
