@@ -34,6 +34,35 @@ public:
         std::visit(visitor, term->var);
     }
 
+    void gen_bin_expr(const NodeBinExpr* bin_expr)
+    {
+        struct BinExprVisitor {
+            Generator* gen;
+
+            void operator()(const NodeBinExprAdd* expr_add) const
+            {
+                gen->gen_expr(expr_add->lhs);
+                gen->gen_expr(expr_add->rhs);
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    add rax, rbx\n";
+                gen->push("rax");
+            }
+            void operator()(const NodeBinExprMul* expr_mul) const
+            {
+                gen->gen_expr(expr_mul->lhs);
+                gen->gen_expr(expr_mul->rhs);
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    mul rbx\n";
+                gen->push("rax");
+            }
+        };
+
+        BinExprVisitor visitor { .gen = this };
+        std::visit(visitor, bin_expr->var);
+    }
+
     void gen_expr(const NodeExpr* expr)
     {
         struct ExpressionVisitor {
@@ -44,12 +73,7 @@ public:
             }
             void operator()(const NodeBinExpr* bin_expr) const
             {
-                gen->gen_expr(bin_expr->add->lhs);
-                gen->gen_expr(bin_expr->add->rhs);
-                gen->pop("rax");
-                gen->pop("rbx");
-                gen->m_output << "    add rax, rbx\n";
-                gen->push("rax");
+                gen->gen_bin_expr(bin_expr);
             };
         };
         ExpressionVisitor visitor { .gen = this };
