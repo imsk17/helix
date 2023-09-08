@@ -3,7 +3,7 @@
 #include "string"
 #include "vector"
 
-enum class TokenType { exit, int_lit, semi, open_parenthesis, close_parenthesis, identifier, let, eq };
+enum class TokenType { exit, int_lit, semi, open_parenthesis, close_parenthesis, identifier, let, eq, plus };
 
 struct Token {
     TokenType type;
@@ -46,6 +46,11 @@ public:
             else if (peek().value() == '(') {
                 consume();
                 tokens.push_back({ .type = TokenType::open_parenthesis });
+                continue;
+            }
+            else if (peek().value() == '+') {
+                consume();
+                tokens.push_back({ .type = TokenType::plus });
                 continue;
             }
             else if (peek().value() == '=') {
