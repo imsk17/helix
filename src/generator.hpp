@@ -11,12 +11,12 @@ public:
     {
         struct ExpressionVisitor {
             Generator* gen;
-            void operator()(const NodeExprIntLit& expr_int_lit)
+            void operator()(const NodeExprIntLit& expr_int_lit) const
             {
                 gen->m_output << "    mov rax, " << expr_int_lit.int_lit.value.value() << "\n";
                 gen->push("rax");
             }
-            void operator()(const NodeExprIdent& expr_ident)
+            void operator()(const NodeExprIdent& expr_ident) const
             {
                 if (!gen->m_vars.contains(expr_ident.ident.value.value())) {
                     std::cerr << "Undeclared Identifier: " << expr_ident.ident.value.value() << std::endl;
@@ -45,7 +45,7 @@ public:
                 gen->pop("rdi");
                 gen->m_output << "    syscall\n";
             }
-            void operator()(const NodeStmtLet& stmt_let)
+            void operator()(const NodeStmtLet& stmt_let) const
             {
                 if (gen->m_vars.contains(stmt_let.ident.value.value())) {
                     std::cerr << "Identifier already declared: " << stmt_let.ident.value.value() << std::endl;
