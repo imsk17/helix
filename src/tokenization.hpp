@@ -70,53 +70,43 @@ public:
                 if (buf == "exit") {
                     tokens.push_back({ .type = TokenType::exit });
                     buf.clear();
-                    continue;
                 }
                 else if (buf == "let") {
                     tokens.push_back({ .type = TokenType::let });
                     buf.clear();
-                    continue;
                 }
                 else {
                     tokens.push_back({ .type = TokenType::identifier, .value = buf });
                     buf.clear();
-                    continue;
                 }
             }
             else if (peek().value() == '(') {
                 consume();
                 tokens.push_back({ .type = TokenType::open_parenthesis });
-                continue;
             }
             else if (peek().value() == '+') {
                 consume();
                 tokens.push_back({ .type = TokenType::plus });
-                continue;
             }
             else if (peek().value() == '*') {
                 consume();
                 tokens.push_back({ .type = TokenType::star });
-                continue;
             }
             else if (peek().value() == '/') {
                 consume();
                 tokens.push_back({ .type = TokenType::div });
-                continue;
             }
             else if (peek().value() == '-') {
                 consume();
                 tokens.push_back({ .type = TokenType::sub });
-                continue;
             }
             else if (peek().value() == '=') {
                 consume();
                 tokens.push_back({ .type = TokenType::eq });
-                continue;
             }
             else if (peek().value() == ')') {
                 consume();
                 tokens.push_back({ .type = TokenType::close_parenthesis });
-                continue;
             }
             else if (std::isdigit(peek().value())) {
                 buf.push_back(consume());
@@ -125,7 +115,6 @@ public:
                 }
                 tokens.push_back({ .type = TokenType::int_lit, .value = buf });
                 buf.clear();
-                continue;
             }
             else if (peek().value() == ';') {
                 consume();
@@ -133,7 +122,6 @@ public:
             }
             else if (std::isspace(peek().value())) {
                 consume();
-                continue;
             }
             else {
                 std::cerr << "You Messed Up.";
