@@ -1,5 +1,11 @@
 #include "parser.hpp"
 
+#if __APPLE__
+#define EXIT_SYS_CODE 0x2000001
+#elif __linux__
+#define EXIT_SYS_CODE 60
+#endif
+
 class Generator {
 public:
     inline explicit Generator(NodeProgram program)
@@ -109,7 +115,7 @@ public:
             void operator()(const NodeStmtExit* stmt_exit) const
             {
                 gen->gen_expr(stmt_exit->expr);
-                gen->m_output << "    mov rax, 0x2000001\n";
+                gen->m_output << "    mov rax, " << EXIT_SYS_CODE << "\n";
                 gen->pop("rdi");
                 gen->m_output << "    syscall\n";
             }
@@ -136,7 +142,7 @@ public:
             gen_stmt(stmt);
         }
 
-        m_output << "    mov rax, 0x2000001\n";
+        m_output << "    mov rax, " << EXIT_SYS_CODE << "\n";
         m_output << "    mov rdi, 0\n";
         m_output << "    syscall";
         return m_output.str();
