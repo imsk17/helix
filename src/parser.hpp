@@ -38,8 +38,12 @@ struct NodeBinExpr {
     std::variant<NodeBinExprAdd*, NodeBinExprMul*, NodeBinExprSub*, NodeBinExprDiv*> var;
 };
 
+struct NodeTermParen {
+    NodeExpr* expr;
+};
+
 struct NodeTerm {
-    std::variant<NodeTermIntLit*, NodeTermIdent*> var;
+    std::variant<NodeTermIntLit*, NodeTermIdent*, NodeTermParen*> var;
 };
 
 struct NodeExpr {
@@ -87,6 +91,19 @@ public:
             term->var = term_ident;
             return term;
         }
+        else if (auto open_paren = try_consume(TokenType::open_parenthesis)) {
+            auto expr = parse_expr();
+            if (!expr.has_value()) {
+                std::cerr << "Expected Expression" << std::endl;
+                exit(EXIT_FAILURE);
+            }
+            try_consume(TokenType::close_parenthesis, "Expected `)`");
+            auto term_paren = m_allocator.alloc<NodeTermParen>();
+            term_paren->expr = expr.value();
+            auto term = m_allocator.alloc<NodeTerm>();
+            term->var = term_paren;
+            return term;
+        }
         else {
             return {};
         }
@@ -100,8 +117,6 @@ public:
         }
         auto expr_lhs = m_allocator.alloc<NodeExpr>();
         expr_lhs->var = term_lhs.value();
-        // ^^ CHECKED.
-
         while (true) {
             std::optional<Token> curr_token = peek();
             std::optional<int> prec;
@@ -150,9 +165,6 @@ public:
                 mul->lhs = expr_lhs2;
                 mul->rhs = expr_rhs.value();
                 expr->var = mul;
-            }
-            else {
-                assert(false); // Should not be reachable
             }
             expr_lhs->var = expr;
         }
