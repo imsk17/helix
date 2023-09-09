@@ -24,8 +24,18 @@ struct NodeBinExprMul {
     NodeExpr* rhs;
 };
 
+struct NodeBinExprDiv {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+
+struct NodeBinExprSub {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+
 struct NodeBinExpr {
-    std::variant<NodeBinExprAdd*, NodeBinExprMul*> var;
+    std::variant<NodeBinExprAdd*, NodeBinExprMul*, NodeBinExprSub*, NodeBinExprDiv*> var;
 };
 
 struct NodeTerm {
@@ -120,12 +130,29 @@ public:
                 add->rhs = expr_rhs.value();
                 expr->var = add;
             }
+            if (op.type == TokenType::sub) {
+                auto sub = m_allocator.alloc<NodeBinExprSub>();
+                expr_lhs2->var = expr_lhs->var;
+                sub->lhs = expr_lhs2;
+                sub->rhs = expr_rhs.value();
+                expr->var = sub;
+            }
+            if (op.type == TokenType::div) {
+                auto div = m_allocator.alloc<NodeBinExprDiv>();
+                expr_lhs2->var = expr_lhs->var;
+                div->lhs = expr_lhs2;
+                div->rhs = expr_rhs.value();
+                expr->var = div;
+            }
             else if (op.type == TokenType::star) {
                 auto mul = m_allocator.alloc<NodeBinExprMul>();
                 expr_lhs2->var = expr_lhs->var;
                 mul->lhs = expr_lhs2;
                 mul->rhs = expr_rhs.value();
                 expr->var = mul;
+            }
+            else {
+                assert(false); // Should not be reachable
             }
             expr_lhs->var = expr;
         }

@@ -41,8 +41,8 @@ public:
 
             void operator()(const NodeBinExprAdd* expr_add) const
             {
-                gen->gen_expr(expr_add->lhs);
                 gen->gen_expr(expr_add->rhs);
+                gen->gen_expr(expr_add->lhs);
                 gen->pop("rax");
                 gen->pop("rbx");
                 gen->m_output << "    add rax, rbx\n";
@@ -50,11 +50,29 @@ public:
             }
             void operator()(const NodeBinExprMul* expr_mul) const
             {
-                gen->gen_expr(expr_mul->lhs);
                 gen->gen_expr(expr_mul->rhs);
+                gen->gen_expr(expr_mul->lhs);
                 gen->pop("rax");
                 gen->pop("rbx");
                 gen->m_output << "    mul rbx\n";
+                gen->push("rax");
+            }
+            void operator()(const NodeBinExprSub* expr_sub) const
+            {
+                gen->gen_expr(expr_sub->rhs);
+                gen->gen_expr(expr_sub->lhs);
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    sub rax, rbx\n";
+                gen->push("rax");
+            }
+            void operator()(const NodeBinExprDiv* expr_div) const
+            {
+                gen->gen_expr(expr_div->rhs);
+                gen->gen_expr(expr_div->lhs);
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    div rbx\n";
                 gen->push("rax");
             }
         };

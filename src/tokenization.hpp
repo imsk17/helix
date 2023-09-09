@@ -3,13 +3,27 @@
 #include "string"
 #include "vector"
 
-enum class TokenType { exit, int_lit, semi, open_parenthesis, close_parenthesis, identifier, let, eq, plus, star };
+enum class TokenType {
+    exit,
+    int_lit,
+    semi,
+    open_parenthesis,
+    close_parenthesis,
+    identifier,
+    let,
+    eq,
+    plus,
+    star,
+    div,
+    sub
+};
 
 bool is_binary_operation(TokenType type)
 {
     switch (type) {
+    case TokenType::div:
+    case TokenType::sub:
     case TokenType::plus:
-        return true;
     case TokenType::star:
         return true;
     default:
@@ -20,8 +34,10 @@ bool is_binary_operation(TokenType type)
 std::optional<int> bin_prec(TokenType type)
 {
     switch (type) {
+    case TokenType::sub:
     case TokenType::plus:
         return 0;
+    case TokenType::div:
     case TokenType::star:
         return 1;
     default:
@@ -80,6 +96,16 @@ public:
             else if (peek().value() == '*') {
                 consume();
                 tokens.push_back({ .type = TokenType::star });
+                continue;
+            }
+            else if (peek().value() == '/') {
+                consume();
+                tokens.push_back({ .type = TokenType::div });
+                continue;
+            }
+            else if (peek().value() == '-') {
+                consume();
+                tokens.push_back({ .type = TokenType::sub });
                 continue;
             }
             else if (peek().value() == '=') {
