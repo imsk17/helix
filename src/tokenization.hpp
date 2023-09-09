@@ -15,7 +15,7 @@ enum class TokenType {
     plus,
     star,
     div,
-    sub
+    sub,
 };
 
 bool is_binary_operation(TokenType type)
@@ -93,6 +93,15 @@ public:
                 tokens.push_back({ .type = TokenType::star });
             }
             else if (peek().value() == '/') {
+                // Single Line Comments `//`
+                if (peek(1).has_value() && peek(1).value() == '/') {
+                    consume(); // Consume first slash
+                    consume(); // Consume second slash
+                    while (peek().has_value() && peek().value() != '\n') {
+                        consume();
+                    }
+                    continue;
+                }
                 consume();
                 tokens.push_back({ .type = TokenType::div });
             }
