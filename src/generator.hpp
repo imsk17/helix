@@ -85,6 +85,15 @@ public:
                 gen->m_output << "    div rbx\n";
                 gen->push("rax");
             }
+            void operator()(const NodeBinExprMod* expr_mod) const
+            {
+                gen->gen_expr(expr_mod->rhs);
+                gen->gen_expr(expr_mod->lhs);
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    div rbx\n";
+                gen->push("rdx");
+            }
         };
 
         BinExprVisitor visitor { .gen = this };

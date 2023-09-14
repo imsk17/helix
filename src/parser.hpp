@@ -33,9 +33,13 @@ struct NodeBinExprSub {
     NodeExpr* lhs;
     NodeExpr* rhs;
 };
+struct NodeBinExprMod {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
 
 struct NodeBinExpr {
-    std::variant<NodeBinExprAdd*, NodeBinExprMul*, NodeBinExprSub*, NodeBinExprDiv*> var;
+    std::variant<NodeBinExprAdd*, NodeBinExprMul*, NodeBinExprSub*, NodeBinExprDiv*, NodeBinExprMod*> var;
 };
 
 struct NodeTermParen {
@@ -165,7 +169,15 @@ public:
                 mul->lhs = expr_lhs2;
                 mul->rhs = expr_rhs.value();
                 expr->var = mul;
-            } else {
+            }
+            else if (op.type == TokenType::modulo) {
+                auto mod = m_allocator.alloc<NodeBinExprMod>();
+                expr_lhs2->var = expr_lhs->var;
+                mod->lhs = expr_lhs2;
+                mod->rhs = expr_rhs.value();
+                expr->var = mod;
+            }
+            else {
                 assert(false); // Should not be reachable;
             }
             expr_lhs->var = expr;

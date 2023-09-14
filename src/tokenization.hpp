@@ -16,6 +16,7 @@ enum class TokenType {
     star,
     div,
     sub,
+    modulo,
 };
 
 bool is_binary_operation(TokenType type)
@@ -25,6 +26,7 @@ bool is_binary_operation(TokenType type)
     case TokenType::sub:
     case TokenType::plus:
     case TokenType::star:
+    case TokenType::modulo:
         return true;
     default:
         return false;
@@ -39,6 +41,7 @@ std::optional<int> bin_prec(TokenType type)
         return 0;
     case TokenType::div:
     case TokenType::star:
+    case TokenType::modulo:
         return 1;
     default:
         return {};
@@ -91,6 +94,10 @@ public:
             else if (peek().value() == '*') {
                 consume();
                 tokens.push_back({ .type = TokenType::star });
+            }
+            else if (peek().value() == '%') {
+                consume();
+                tokens.push_back({ .type = TokenType::modulo });
             }
             else if (peek().value() == '/') {
                 // Single Line Comments `//`
