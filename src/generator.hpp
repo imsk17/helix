@@ -94,6 +94,84 @@ public:
                 gen->m_output << "    div rbx\n";
                 gen->push("rdx");
             }
+            void operator()(const NodeBinExprGt* expr_gt) const
+            {
+                gen->gen_expr(expr_gt->rhs);
+                gen->gen_expr(expr_gt->lhs);
+                gen->m_output << "; preparing gt\n";
+                gen->m_output << "    mov rcx, 0\n";
+                gen->m_output << "    mov rdx, 1\n";
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    cmp rax, rbx\n";
+                gen->m_output << "    cmovg rcx, rdx\n";
+                gen->push("rcx");
+            }
+            void operator()(const NodeBinExprLt* expr_lt) const
+            {
+                gen->gen_expr(expr_lt->rhs);
+                gen->gen_expr(expr_lt->lhs);
+                gen->m_output << "; preparing lt\n";
+                gen->m_output << "    mov rcx, 0\n";
+                gen->m_output << "    mov rdx, 1\n";
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    cmp rax, rbx\n";
+                gen->m_output << "    cmovl rcx, rdx\n";
+                gen->push("rcx");
+            }
+            void operator()(const NodeBinExprGte* expr_gte) const
+            {
+                gen->gen_expr(expr_gte->rhs);
+                gen->gen_expr(expr_gte->lhs);
+                gen->m_output << "; preparing gte\n";
+                gen->m_output << "    mov rcx, 0\n";
+                gen->m_output << "    mov rdx, 1\n";
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    cmp rax, rbx\n";
+                gen->m_output << "    cmovge rcx, rdx\n";
+                gen->push("rcx");
+            }
+            void operator()(const NodeBinExprLte* expr_lte) const
+            {
+                gen->gen_expr(expr_lte->rhs);
+                gen->gen_expr(expr_lte->lhs);
+                gen->m_output << "; preparing lte\n";
+                gen->m_output << "    mov rcx, 0\n";
+                gen->m_output << "    mov rdx, 1\n";
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    cmp rax, rbx\n";
+                gen->m_output << "    cmovle rcx, rdx\n";
+                gen->push("rcx");
+            }
+            void operator()(const NodeBinExprEquality* expr_equality) const
+            {
+                gen->gen_expr(expr_equality->rhs);
+                gen->gen_expr(expr_equality->lhs);
+                gen->m_output << "; preparing equality\n";
+                gen->m_output << "    mov rcx, 0\n";
+                gen->m_output << "    mov rdx, 1\n";
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    cmp rax, rbx\n";
+                gen->m_output << "    cmove rcx, rdx\n";
+                gen->push("rcx");
+            }
+            void operator()(const NodeBinExprNotEquality* expr_not_equality) const
+            {
+                gen->gen_expr(expr_not_equality->rhs);
+                gen->gen_expr(expr_not_equality->lhs);
+                gen->m_output << "; preparing not equality\n";
+                gen->m_output << "    mov rcx, 0\n";
+                gen->m_output << "    mov rdx, 1\n";
+                gen->pop("rax");
+                gen->pop("rbx");
+                gen->m_output << "    cmp rax, rbx\n";
+                gen->m_output << "    cmovne rcx, rdx\n";
+                gen->push("rcx");
+            }
         };
 
         BinExprVisitor visitor { .gen = this };

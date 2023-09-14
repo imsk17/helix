@@ -38,8 +38,49 @@ struct NodeBinExprMod {
     NodeExpr* rhs;
 };
 
+struct NodeBinExprLt {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+
+struct NodeBinExprGt {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+
+struct NodeBinExprLte {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+
+struct NodeBinExprGte {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+
+struct NodeBinExprEquality {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+struct NodeBinExprNotEquality {
+    NodeExpr* lhs;
+    NodeExpr* rhs;
+};
+
 struct NodeBinExpr {
-    std::variant<NodeBinExprAdd*, NodeBinExprMul*, NodeBinExprSub*, NodeBinExprDiv*, NodeBinExprMod*> var;
+    std::variant<
+        NodeBinExprAdd*,
+        NodeBinExprMul*,
+        NodeBinExprSub*,
+        NodeBinExprDiv*,
+        NodeBinExprMod*,
+        NodeBinExprLt*,
+        NodeBinExprGt*,
+        NodeBinExprLte*,
+        NodeBinExprGte*,
+        NodeBinExprEquality*,
+        NodeBinExprNotEquality*>
+        var;
 };
 
 struct NodeTermParen {
@@ -176,6 +217,48 @@ public:
                 mod->lhs = expr_lhs2;
                 mod->rhs = expr_rhs.value();
                 expr->var = mod;
+            }
+            else if (op.type == TokenType::lt) {
+                auto lt = m_allocator.alloc<NodeBinExprLt>();
+                expr_lhs2->var = expr_lhs->var;
+                lt->lhs = expr_lhs2;
+                lt->rhs = expr_rhs.value();
+                expr->var = lt;
+            }
+            else if (op.type == TokenType::gt) {
+                auto gt = m_allocator.alloc<NodeBinExprGt>();
+                expr_lhs2->var = expr_lhs->var;
+                gt->lhs = expr_lhs2;
+                gt->rhs = expr_rhs.value();
+                expr->var = gt;
+            }
+            else if (op.type == TokenType::gte) {
+                auto gte = m_allocator.alloc<NodeBinExprGte>();
+                expr_lhs2->var = expr_lhs->var;
+                gte->lhs = expr_lhs2;
+                gte->rhs = expr_rhs.value();
+                expr->var = gte;
+            }
+            else if (op.type == TokenType::lte) {
+                auto lte = m_allocator.alloc<NodeBinExprLte>();
+                expr_lhs2->var = expr_lhs->var;
+                lte->lhs = expr_lhs2;
+                lte->rhs = expr_rhs.value();
+                expr->var = lte;
+            }
+            else if (op.type == TokenType::equality) {
+                auto equality = m_allocator.alloc<NodeBinExprEquality>();
+                expr_lhs2->var = expr_lhs->var;
+                equality->lhs = expr_lhs2;
+                equality->rhs = expr_rhs.value();
+                expr->var = equality;
+            }
+            else if (op.type == TokenType::not_equality) {
+                auto not_equality = m_allocator.alloc<NodeBinExprNotEquality>();
+                expr_lhs2->var = expr_lhs->var;
+                not_equality->lhs = expr_lhs2;
+                not_equality->rhs = expr_rhs.value();
+                expr->var = not_equality;
             }
             else {
                 assert(false); // Should not be reachable;

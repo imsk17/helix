@@ -17,6 +17,12 @@ enum class TokenType {
     div,
     sub,
     modulo,
+    lt,
+    gt,
+    lte,
+    gte,
+    equality,
+    not_equality
 };
 
 bool is_binary_operation(TokenType type)
@@ -27,6 +33,12 @@ bool is_binary_operation(TokenType type)
     case TokenType::plus:
     case TokenType::star:
     case TokenType::modulo:
+    case TokenType::lt:
+    case TokenType::gt:
+    case TokenType::lte:
+    case TokenType::gte:
+    case TokenType::equality:
+    case TokenType::not_equality:
         return true;
     default:
         return false;
@@ -43,6 +55,14 @@ std::optional<int> bin_prec(TokenType type)
     case TokenType::star:
     case TokenType::modulo:
         return 1;
+    case TokenType::lt:
+    case TokenType::gt:
+    case TokenType::lte:
+    case TokenType::gte:
+        return 2;
+    case TokenType::equality:
+    case TokenType::not_equality:
+        return 3;
     default:
         return {};
     }
@@ -91,9 +111,34 @@ public:
                 consume();
                 tokens.push_back({ .type = TokenType::plus });
             }
+            else if (peek().value() == '<') {
+                if (peek(1).has_value() && peek(1).value() == '=') {
+                    consume();
+                    consume();
+                    tokens.push_back({ .type = TokenType::lte });
+                    continue;
+                }
+                consume();
+                tokens.push_back({ .type = TokenType::lt });
+            }
+            else if (peek().value() == '>') {
+                if (peek(1).has_value() && peek(1).value() == '=') {
+                    consume();
+                    consume();
+                    tokens.push_back({ .type = TokenType::gte });
+                    continue;
+                }
+                consume();
+                tokens.push_back({ .type = TokenType::gt });
+            }
             else if (peek().value() == '*') {
                 consume();
                 tokens.push_back({ .type = TokenType::star });
+            }
+            else if (peek().value() == '!' && peek(1).has_value() && peek(1).value() == '=') {
+                consume();
+                consume();
+                tokens.push_back({ .type = TokenType::not_equality });
             }
             else if (peek().value() == '%') {
                 consume();
@@ -117,6 +162,12 @@ public:
                 tokens.push_back({ .type = TokenType::sub });
             }
             else if (peek().value() == '=') {
+                if (peek(1).has_value() && peek(1).value() == '=') {
+                    consume();
+                    consume();
+                    tokens.push_back({ .type = TokenType::equality });
+                    continue;
+                }
                 consume();
                 tokens.push_back({ .type = TokenType::eq });
             }
