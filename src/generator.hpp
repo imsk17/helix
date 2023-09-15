@@ -195,6 +195,15 @@ public:
         std::visit(visitor, expr->var);
     }
 
+    void gen_scope(const NodeScope* scope)
+    {
+        begin_scope();
+        for (const NodeStmt* stmt : scope->stmts) {
+            gen_stmt(stmt);
+        }
+        end_scope();
+    }
+
     void gen_stmt(const NodeStmt* stmt)
     {
         struct StatementVisitor {
@@ -218,13 +227,19 @@ public:
                 gen->m_vars.push_back({ .name = stmt_let->ident.value.value(), .stack_location = gen->m_stack_size });
                 gen->gen_expr(stmt_let->expr);
             }
-            void operator()(const NodeStmtScope* scope) const
+            void operator()(const NodeScope* scope) const
             {
-                gen->begin_scope();
-                for (const NodeStmt* stmt : scope->stmts) {
-                    gen->gen_stmt(stmt);
-                }
-                gen->end_scope();
+                gen->gen_scope(scope);
+            }
+            void operator()(const NodeStmtIf* stmt_if) const
+            {
+                gen->gen_expr(stmt_if->expr);
+                gen->pop("rax");
+                auto label = gen->create_label();
+                gen->m_output << "    test rax, rax\n";
+                gen->m_output << "    jz " << label << "\n";
+                gen->gen_scope(stmt_if->scope);
+                gen->m_output << label << ":\n";
             }
         };
 
@@ -264,6 +279,13 @@ public:
     };
 
 private:
+    std::string create_label()
+    {
+        std::stringstream ss;
+        ss << "label" << m_label_count++;
+        return ss.str();
+    }
+
     void begin_scope()
     {
         m_scopes.push_back(m_vars.size());
@@ -284,4 +306,5 @@ private:
     size_t m_stack_size = 0;
     std::vector<Var> m_vars {};
     std::vector<size_t> m_scopes {};
+    int m_label_count = 0;
 };
