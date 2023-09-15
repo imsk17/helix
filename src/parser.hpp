@@ -104,8 +104,14 @@ struct NodeStmtLet {
     NodeExpr* expr;
 };
 
+struct NodeStmt;
+
+struct NodeStmtScope {
+    std::vector<NodeStmt*> stmts;
+};
+
 struct NodeStmt {
-    std::variant<NodeStmtExit*, NodeStmtLet*> var;
+    std::variant<NodeStmtExit*, NodeStmtLet*, NodeStmtScope*> var;
 };
 
 struct NodeProgram {
@@ -309,6 +315,16 @@ public:
             auto node_stmt = m_allocator.alloc<NodeStmt>();
             node_stmt->var = stmt;
             return node_stmt;
+        }
+        else if (auto open_curly = try_consume(TokenType::open_curly)) {
+            auto scope = m_allocator.alloc<NodeStmtScope>();
+            while (auto stmt = parse_stmt()) {
+                scope->stmts.push_back(stmt.value());
+            }
+            try_consume(TokenType::close_curly, "Expected `}`");
+            auto stmt = m_allocator.alloc<NodeStmt>();
+            stmt->var = scope;
+            return stmt;
         }
         else {
             return {};

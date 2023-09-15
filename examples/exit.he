@@ -1,5 +1,10 @@
 // Now supports single line comments
 let x = (15 + 1) * 4; // After Expression Also
 let y = x + 8 * 2;
-let z = 7 != 1;
-exit(z);
+
+{
+    let z = 2;
+    // exit(z);
+}
+let m = 7 != 1;
+exit(m);

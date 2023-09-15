@@ -22,7 +22,9 @@ enum class TokenType {
     lte,
     gte,
     equality,
-    not_equality
+    not_equality,
+    open_curly,
+    close_curly
 };
 
 bool is_binary_operation(TokenType type)
@@ -120,6 +122,14 @@ public:
                 }
                 consume();
                 tokens.push_back({ .type = TokenType::lt });
+            }
+            else if (peek().value() == '{') {
+                consume();
+                tokens.push_back({ .type = TokenType::open_curly });
+            }
+            else if (peek().value() == '}') {
+                consume();
+                tokens.push_back({ .type = TokenType::close_curly });
             }
             else if (peek().value() == '>') {
                 if (peek(1).has_value() && peek(1).value() == '=') {
