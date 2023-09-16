@@ -337,6 +337,7 @@ public:
             if (auto scope = parse_scope()) {
                 auto stmt = m_allocator.alloc<NodeStmt>();
                 stmt->var = scope.value();
+                return stmt;
             }
             else {
                 std::cerr << "Invalid Scope" << std::endl;
