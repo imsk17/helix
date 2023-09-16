@@ -25,7 +25,9 @@ enum class TokenType {
     not_equality,
     open_curly,
     close_curly,
-    _if
+    _if,
+    _true,
+    _false,
 };
 
 bool is_binary_operation(TokenType type)
@@ -103,6 +105,14 @@ public:
                 }
                 else if (buf == "if") {
                     tokens.push_back({ .type = TokenType::_if });
+                    buf.clear();
+                }
+                else if (buf == "true") {
+                    tokens.push_back({ .type = TokenType::int_lit, .value = "1" });
+                    buf.clear();
+                }
+                else if (buf == "false") {
+                    tokens.push_back({ .type = TokenType::int_lit, .value = "0" });
                     buf.clear();
                 }
                 else {
